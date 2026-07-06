@@ -120,7 +120,8 @@
   .status-sel.screening { background: var(--amber-bg); color: var(--amber); }
   .status-sel.interview { background: var(--purple-bg); color: var(--purple); }
   .status-sel.offer { background: var(--green-bg); color: var(--green); }
-  .status-sel.declined { background: var(--red-bg); color: var(--red); }
+  .status-sel.declined { background: var(--surface2); color: var(--text2); }
+  .status-sel.rejected { background: var(--red-bg); color: var(--red); }
   .status-sel.ghosted { background: var(--surface2); color: var(--text3); }
 
   /* PRIORITY DOT */
@@ -252,7 +253,8 @@
         <div class="filter-pill" data-filter="screening" onclick="setFilter(this)">Screening</div>
         <div class="filter-pill" data-filter="interview" onclick="setFilter(this)">Interview</div>
         <div class="filter-pill" data-filter="offer" onclick="setFilter(this)">Offer</div>
-        <div class="filter-pill" data-filter="declined" onclick="setFilter(this)">Declined</div>
+        <div class="filter-pill" data-filter="declined" onclick="setFilter(this)">I Declined</div>
+        <div class="filter-pill" data-filter="rejected" onclick="setFilter(this)">Rejected</div>
         <div class="filter-pill" data-filter="ghosted" onclick="setFilter(this)">Ghosted</div>
       </div>
 
@@ -363,7 +365,8 @@
           <option value="screening">Screening</option>
           <option value="interview">Interview</option>
           <option value="offer">Offer</option>
-          <option value="declined">Declined</option>
+          <option value="declined">I Declined</option>
+          <option value="rejected">Rejected</option>
           <option value="ghosted">Ghosted</option>
         </select>
       </div>
@@ -525,7 +528,7 @@ function setFilter(el) {
 
 // STATS
 function renderStats() {
-  const counts = { wishlist:0, applied:0, screening:0, interview:0, offer:0, declined:0, ghosted:0 };
+  const counts = { wishlist:0, applied:0, screening:0, interview:0, offer:0, declined:0, rejected:0, ghosted:0 };
   apps.forEach(a => { if (counts[a.status] !== undefined) counts[a.status]++; });
   const active = apps.filter(a => ['applied','screening','interview'].includes(a.status)).length;
   document.getElementById('stats-row').innerHTML = `
@@ -533,7 +536,7 @@ function renderStats() {
     <div class="stat"><div class="stat-label">Active</div><div class="stat-val">${active}</div><div class="stat-sub">in progress</div></div>
     <div class="stat purple"><div class="stat-label">Interviews</div><div class="stat-val">${interviews.length}</div><div class="stat-sub">logged</div></div>
     <div class="stat green"><div class="stat-label">Offers</div><div class="stat-val">${counts.offer}</div><div class="stat-sub">received</div></div>
-    <div class="stat amber"><div class="stat-label">Response rate</div><div class="stat-val">${apps.length ? Math.round(((apps.length - counts.wishlist - counts.ghosted) / Math.max(apps.filter(a=>a.status!=='wishlist').length,1)) * 100) : 0}%</div><div class="stat-sub">of sent apps</div></div>`;
+    <div class="stat amber"><div class="stat-label">Response rate</div><div class="stat-val">${apps.length ? Math.round((counts.screening + counts.interview + counts.offer) / Math.max(apps.filter(a=>a.status!=='wishlist').length, 1) * 100) : 0}%</div><div class="stat-sub">of sent apps</div></div>`;
   document.getElementById('nc-pipeline').textContent = apps.length;
   document.getElementById('nc-interviews').textContent = interviews.length;
 }
@@ -550,7 +553,7 @@ function renderPipeline() {
 
   filtered.sort((a,b) => {
     const po = {high:0,med:1,low:2};
-    const so = {interview:0,screening:1,applied:2,offer:3,wishlist:4,declined:5,ghosted:6};
+    const so = {interview:0,screening:1,applied:2,offer:3,wishlist:4,declined:5,rejected:5,ghosted:6};
     if ((so[a.status]??4) !== (so[b.status]??4)) return (so[a.status]??4) - (so[b.status]??4);
     return (po[a.priority]??1) - (po[b.priority]??1);
   });
@@ -582,7 +585,8 @@ function renderPipeline() {
           <option value="screening" ${a.status==='screening'?'selected':''}>Screening</option>
           <option value="interview" ${a.status==='interview'?'selected':''}>Interview</option>
           <option value="offer" ${a.status==='offer'?'selected':''}>Offer</option>
-          <option value="declined" ${a.status==='declined'?'selected':''}>Declined</option>
+          <option value="declined" ${a.status==='declined'?'selected':''}>I Declined</option>
+          <option value="rejected" ${a.status==='rejected'?'selected':''}>Rejected</option>
           <option value="ghosted" ${a.status==='ghosted'?'selected':''}>Ghosted</option>
         </select>
       </td>
@@ -749,7 +753,7 @@ function saveInterview() {
   interviews.unshift(entry);
   logActivity(`Interview logged: ${entry.round}`, company, role);
 
-  if (selectedApp && !['interview','offer','declined','ghosted'].includes(selectedApp.status)) {
+  if (selectedApp && !['interview','offer','declined','rejected','ghosted'].includes(selectedApp.status)) {
     selectedApp.status = 'interview';
   }
 
@@ -831,7 +835,7 @@ function renderTimeline() {
     if (e.includes('added')) return 'accent';
     if (e.includes('Interview')) return '';
     if (e.includes('offer') || e.includes('Offer')) return 'green';
-    if (e.includes('declined') || e.includes('removed')) return 'red';
+    if (e.includes('declined') || e.includes('rejected') || e.includes('removed')) return 'red';
     if (e.includes('updated')) return 'amber';
     return 'gray';
   };
