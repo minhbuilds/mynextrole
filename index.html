@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My NextRole</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=DM+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg: #F5F4F0;
+    --surface: #FFFFFF;
+    --surface2: #EEECEA;
+    --border: rgba(0,0,0,0.07);
+    --border-md: rgba(0,0,0,0.12);
+    --text: #191815;
+    --text2: #6A6860;
+    --text3: #A8A69F;
+    --accent: #2A52D4;
+    --accent-bg: #EEF2FC;
+    --accent-dark: #1A3699;
+    --green: #1A7A52;
+    --green-bg: #E7F5EE;
+    --amber: #A85500;
+    --amber-bg: #FFF0E0;
+    --red: #B83030;
+    --red-bg: #FDEAEA;
+    --purple: #6535A8;
+    --purple-bg: #F2ECFB;
+    --teal: #0F7A72;
+    --teal-bg: #E5F4F3;
+    --r: 10px;
+    --r-sm: 6px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; font-size: 14px; line-height: 1.6; }
+
+  /* LAYOUT */
+  .shell { display: flex; min-height: 100vh; }
+  .sidebar { width: 210px; flex-shrink: 0; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 20; }
+  .main { margin-left: 210px; flex: 1; padding: 28px 32px 60px; }
+
+  /* LOGO */
+  .logo { padding: 20px 18px 16px; border-bottom: 1px solid var(--border); }
+  .logo-name { font-size: 17px; font-weight: 600; letter-spacing: -0.4px; color: var(--text); }
+  .logo-name span { color: var(--accent); }
+  .logo-tag { font-size: 11px; color: var(--text3); font-family: 'DM Mono', monospace; margin-top: 1px; }
+
+  /* NAV */
+  .nav { padding: 10px 8px; flex: 1; }
+  .nav-label { font-size: 10px; font-weight: 600; color: var(--text3); letter-spacing: 0.08em; text-transform: uppercase; padding: 8px 10px 4px; }
+  .nav-btn { display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 10px; border-radius: var(--r-sm); border: none; background: none; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text2); cursor: pointer; transition: all 0.12s; margin-bottom: 1px; text-align: left; }
+  .nav-btn:hover { background: var(--surface2); color: var(--text); }
+  .nav-btn.active { background: var(--accent-bg); color: var(--accent-dark); font-weight: 500; }
+  .nav-btn svg { width: 15px; height: 15px; flex-shrink: 0; }
+  .nav-count { margin-left: auto; font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500; background: var(--surface2); color: var(--text2); padding: 1px 7px; border-radius: 99px; }
+  .nav-btn.active .nav-count { background: var(--accent); color: white; }
+
+  /* STAT CARDS */
+  .stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 24px; }
+  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 14px 14px 12px; }
+  .stat-label { font-size: 10px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 5px; }
+  .stat-val { font-size: 26px; font-weight: 600; font-family: 'DM Mono', monospace; letter-spacing: -1.5px; color: var(--text); }
+  .stat-sub { font-size: 11px; color: var(--text3); margin-top: 2px; }
+  .stat.accent { border-top: 2px solid var(--accent); }
+  .stat.green { border-top: 2px solid var(--green); }
+  .stat.amber { border-top: 2px solid var(--amber); }
+  .stat.purple { border-top: 2px solid var(--purple); }
+
+  /* PAGE */
+  .page { display: none; }
+  .page.active { display: block; }
+  .page-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 20px; }
+  .page-title { font-size: 20px; font-weight: 600; letter-spacing: -0.5px; }
+  .page-sub { font-size: 13px; color: var(--text2); margin-top: 2px; }
+
+  /* BUTTONS */
+  .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: var(--r-sm); font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; border: none; transition: all 0.12s; white-space: nowrap; }
+  .btn svg { width: 14px; height: 14px; }
+  .btn-primary { background: var(--accent); color: white; }
+  .btn-primary:hover { background: var(--accent-dark); }
+  .btn-ghost { background: var(--surface); color: var(--text2); border: 1px solid var(--border-md); }
+  .btn-ghost:hover { background: var(--surface2); color: var(--text); }
+  .btn-sm { padding: 5px 10px; font-size: 12px; }
+  .btn-icon { padding: 5px; background: none; border: none; cursor: pointer; color: var(--text3); border-radius: var(--r-sm); display: inline-flex; align-items: center; justify-content: center; }
+  .btn-icon:hover { background: var(--surface2); color: var(--text); }
+  .btn-icon svg { width: 15px; height: 15px; }
+
+  /* FILTERS */
+  .filters { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+  .filter-pill { padding: 5px 12px; border-radius: 99px; font-size: 12px; font-weight: 500; cursor: pointer; border: 1px solid var(--border-md); background: var(--surface); color: var(--text2); transition: all 0.12s; }
+  .filter-pill:hover { border-color: var(--accent); color: var(--accent); }
+  .filter-pill.active { background: var(--accent); color: white; border-color: var(--accent); }
+
+  /* SEARCH */
+  .search-wrap { position: relative; margin-bottom: 16px; }
+  .search-wrap svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; color: var(--text3); pointer-events: none; }
+  .search-input { width: 100%; padding: 8px 10px 8px 32px; border-radius: var(--r-sm); border: 1px solid var(--border-md); background: var(--surface); font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text); outline: none; transition: border-color 0.15s; }
+  .search-input:focus { border-color: var(--accent); }
+
+  /* TABLE */
+  .table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; }
+  table { width: 100%; border-collapse: collapse; }
+  thead th { text-align: left; font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.07em; padding: 10px 14px; background: var(--surface2); border-bottom: 1px solid var(--border); white-space: nowrap; }
+  tbody td { padding: 12px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; font-size: 13px; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: #FAFAF8; }
+  .td-company { font-weight: 500; color: var(--text); }
+  .td-role { color: var(--text); max-width: 200px; }
+  .td-contact { color: var(--text2); font-size: 12px; }
+  .td-date { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text3); white-space: nowrap; }
+  .td-actions { display: flex; gap: 4px; }
+  .td-notes { font-size: 12px; color: var(--text2); font-style: italic; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  /* STATUS PILL */
+  .status-sel { appearance: none; border: none; border-radius: 99px; font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 600; padding: 3px 10px; cursor: pointer; outline: none; }
+  .status-sel.wishlist { background: var(--surface2); color: var(--text2); }
+  .status-sel.applied { background: var(--accent-bg); color: var(--accent-dark); }
+  .status-sel.screening { background: var(--amber-bg); color: var(--amber); }
+  .status-sel.interview { background: var(--purple-bg); color: var(--purple); }
+  .status-sel.offer { background: var(--green-bg); color: var(--green); }
+  .status-sel.declined { background: var(--red-bg); color: var(--red); }
+  .status-sel.ghosted { background: var(--surface2); color: var(--text3); }
+
+  /* PRIORITY DOT */
+  .priority { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; display: inline-block; }
+  .priority.high { background: var(--red); }
+  .priority.med { background: var(--amber); }
+  .priority.low { background: var(--text3); }
+
+  /* INTERVIEW CARDS */
+  .interview-grid { display: flex; flex-direction: column; gap: 10px; }
+  .interview-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 16px; }
+  .interview-card.upcoming { border-left: 3px solid var(--accent); }
+  .interview-card.passed { opacity: 0.65; }
+  .ic-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
+  .ic-company { font-weight: 600; font-size: 15px; }
+  .ic-role { font-size: 12px; color: var(--text2); margin-top: 1px; }
+  .ic-date-badge { background: var(--accent-bg); color: var(--accent-dark); font-size: 12px; font-weight: 500; padding: 4px 10px; border-radius: var(--r-sm); font-family: 'DM Mono', monospace; white-space: nowrap; }
+  .ic-date-badge.past { background: var(--surface2); color: var(--text3); }
+  .ic-meta { display: flex; flex-wrap: wrap; gap: 8px; font-size: 12px; color: var(--text2); margin-bottom: 8px; }
+  .ic-meta span { display: flex; align-items: center; gap: 4px; }
+  .ic-meta svg { width: 13px; height: 13px; }
+  .ic-notes { font-size: 12px; color: var(--text2); font-style: italic; border-top: 1px solid var(--border); padding-top: 8px; margin-top: 4px; }
+
+  /* MODAL */
+  .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 100; align-items: center; justify-content: center; padding: 20px; }
+  .overlay.open { display: flex; }
+  .modal { background: var(--surface); border-radius: 14px; padding: 24px; width: 520px; max-width: 100%; max-height: 90vh; overflow-y: auto; }
+  .modal-title { font-size: 17px; font-weight: 600; margin-bottom: 18px; letter-spacing: -0.3px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .form-group { margin-bottom: 13px; }
+  .form-label { display: block; font-size: 11px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px; }
+  .form-input, .form-select, .form-textarea { width: 100%; padding: 8px 10px; border-radius: var(--r-sm); border: 1px solid var(--border-md); background: var(--surface); font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text); outline: none; transition: border-color 0.15s; }
+  .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--accent); }
+  .form-textarea { resize: vertical; min-height: 72px; line-height: 1.5; }
+  .modal-footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); }
+
+  /* INTERVIEW MODAL TAB */
+  .modal-tabs { display: flex; gap: 4px; margin-bottom: 18px; background: var(--surface2); padding: 3px; border-radius: var(--r-sm); }
+  .modal-tab { flex: 1; padding: 6px; border: none; background: none; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500; color: var(--text2); border-radius: var(--r-sm); cursor: pointer; transition: all 0.12s; }
+  .modal-tab.active { background: var(--surface); color: var(--text); }
+
+  /* EMPTY */
+  .empty { display: flex; flex-direction: column; align-items: center; padding: 48px 24px; gap: 8px; text-align: center; }
+  .empty-icon { font-size: 28px; margin-bottom: 4px; }
+  .empty-title { font-size: 14px; font-weight: 600; }
+  .empty-sub { font-size: 13px; color: var(--text2); max-width: 280px; }
+
+  /* TOAST */
+  .toast { position: fixed; bottom: 20px; right: 20px; background: var(--text); color: white; padding: 10px 16px; border-radius: var(--r-sm); font-size: 13px; font-weight: 500; opacity: 0; transform: translateY(6px); transition: all 0.18s; pointer-events: none; z-index: 300; }
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  /* TIMELINE */
+  .timeline { display: flex; flex-direction: column; gap: 0; }
+  .tl-item { display: flex; gap: 14px; padding-bottom: 20px; position: relative; }
+  .tl-item:last-child { padding-bottom: 0; }
+  .tl-left { display: flex; flex-direction: column; align-items: center; width: 28px; flex-shrink: 0; }
+  .tl-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); flex-shrink: 0; margin-top: 4px; }
+  .tl-dot.green { background: var(--green); }
+  .tl-dot.amber { background: var(--amber); }
+  .tl-dot.red { background: var(--red); }
+  .tl-dot.gray { background: var(--text3); }
+  .tl-line { width: 1px; background: var(--border-md); flex: 1; margin-top: 4px; }
+  .tl-item:last-child .tl-line { display: none; }
+  .tl-content { flex: 1; padding-top: 0; }
+  .tl-event { font-size: 13px; font-weight: 500; }
+  .tl-meta { font-size: 11px; color: var(--text3); font-family: 'DM Mono', monospace; }
+  .tl-note { font-size: 12px; color: var(--text2); font-style: italic; margin-top: 2px; }
+
+  .section-divider { font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; margin: 20px 0 12px; display: flex; align-items: center; gap: 10px; }
+  .section-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="logo-name">My <span>NextRole</span></div>
+      <div class="logo-tag">by minh</div>
+    </div>
+    <nav class="nav">
+      <div class="nav-label">Views</div>
+      <button class="nav-btn active" onclick="nav('pipeline',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Pipeline
+        <span class="nav-count" id="nc-pipeline">0</span>
+      </button>
+      <button class="nav-btn" onclick="nav('interviews',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        Interviews
+        <span class="nav-count" id="nc-interviews">0</span>
+      </button>
+      <button class="nav-btn" onclick="nav('timeline',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+        Activity log
+      </button>
+    </nav>
+    <div style="padding:12px 18px;border-top:1px solid var(--border)">
+      <div style="font-size:11px;color:var(--text3);margin-bottom:6px;font-family:'DM Mono',monospace">Export</div>
+      <button class="btn btn-ghost btn-sm" onclick="exportCSV()" style="width:100%;justify-content:center">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+        Export CSV
+      </button>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <!-- PIPELINE PAGE -->
+    <div class="page active" id="page-pipeline">
+      <div class="page-header">
+        <div>
+          <div class="page-title">My Pipeline</div>
+          <div class="page-sub">Every application in one place</div>
+        </div>
+        <button class="btn btn-primary" onclick="openAppModal()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+          Add application
+        </button>
+      </div>
+
+      <div class="stats" id="stats-row"></div>
+
+      <div class="filters" id="status-filters">
+        <div class="filter-pill active" data-filter="all" onclick="setFilter(this)">All</div>
+        <div class="filter-pill" data-filter="wishlist" onclick="setFilter(this)">Wishlist</div>
+        <div class="filter-pill" data-filter="applied" onclick="setFilter(this)">Applied</div>
+        <div class="filter-pill" data-filter="screening" onclick="setFilter(this)">Screening</div>
+        <div class="filter-pill" data-filter="interview" onclick="setFilter(this)">Interview</div>
+        <div class="filter-pill" data-filter="offer" onclick="setFilter(this)">Offer</div>
+        <div class="filter-pill" data-filter="declined" onclick="setFilter(this)">Declined</div>
+        <div class="filter-pill" data-filter="ghosted" onclick="setFilter(this)">Ghosted</div>
+      </div>
+
+      <div class="search-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" class="search-input" placeholder="Search company, role, contact..." oninput="renderPipeline()" id="search-input"/>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:20px"></th>
+              <th>Company</th>
+              <th>Role</th>
+              <th>Contact</th>
+              <th>Applied</th>
+              <th>Status</th>
+              <th>Next step</th>
+              <th>Notes</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="pipeline-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- INTERVIEWS PAGE -->
+    <div class="page" id="page-interviews">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Interviews</div>
+          <div class="page-sub">Scheduled, completed, and upcoming rounds</div>
+        </div>
+        <button class="btn btn-primary" onclick="openInterviewModal()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+          Log interview
+        </button>
+      </div>
+      <div class="interview-grid" id="interview-list"></div>
+    </div>
+
+    <!-- TIMELINE PAGE -->
+    <div class="page" id="page-timeline">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Activity log</div>
+          <div class="page-sub">Everything that happened, in order</div>
+        </div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:24px">
+        <div class="timeline" id="timeline-list"></div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- APPLICATION MODAL -->
+<div class="overlay" id="app-modal">
+  <div class="modal">
+    <div class="modal-title" id="app-modal-title">Add application</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Company *</label>
+        <input type="text" class="form-input" id="f-company" placeholder="e.g. Shopify"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Priority</label>
+        <select class="form-select" id="f-priority">
+          <option value="high">High</option>
+          <option value="med" selected>Medium</option>
+          <option value="low">Low</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Role title *</label>
+      <input type="text" class="form-input" id="f-role" placeholder="e.g. Senior Program Manager"/>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Recruiter / contact name</label>
+        <input type="text" class="form-input" id="f-contact" placeholder="e.g. Sarah Chen"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Contact email or LinkedIn</label>
+        <input type="text" class="form-input" id="f-contact-info" placeholder="sarah@company.com"/>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Referral</label>
+        <input type="text" class="form-input" id="f-referral" placeholder="e.g. Katie from Airbnb"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Date applied</label>
+        <input type="date" class="form-input" id="f-date"/>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Status</label>
+        <select class="form-select" id="f-status">
+          <option value="wishlist">Wishlist</option>
+          <option value="applied" selected>Applied</option>
+          <option value="screening">Screening</option>
+          <option value="interview">Interview</option>
+          <option value="offer">Offer</option>
+          <option value="declined">Declined</option>
+          <option value="ghosted">Ghosted</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Salary range (optional)</label>
+        <input type="text" class="form-input" id="f-salary" placeholder="e.g. $120k–$145k"/>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Job posting URL</label>
+      <input type="url" class="form-input" id="f-url" placeholder="https://..."/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Next step / follow-up</label>
+      <input type="text" class="form-input" id="f-next" placeholder="e.g. Recruiter call June 30, 2pm"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Notes</label>
+      <textarea class="form-textarea" id="f-notes" placeholder="Interview prep notes, impressions, salary intel, referral details..."></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeAppModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveApp()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- INTERVIEW MODAL -->
+<div class="overlay" id="int-modal">
+  <div class="modal">
+    <div class="modal-title">Log interview</div>
+    <div class="form-group">
+      <label class="form-label">Company *</label>
+      <select class="form-select" id="i-company" onchange="populateInterviewRole()">
+        <option value="">Select a company...</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Role *</label>
+      <select class="form-select" id="i-role">
+        <option value="">Select company first...</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Interview date *</label>
+        <input type="date" class="form-input" id="i-date"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Time</label>
+        <input type="time" class="form-input" id="i-time"/>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Round</label>
+        <select class="form-select" id="i-round">
+          <option value="Recruiter screen">Recruiter screen</option>
+          <option value="Hiring manager">Hiring manager</option>
+          <option value="Panel interview">Panel interview</option>
+          <option value="Technical screen">Technical screen</option>
+          <option value="Case study">Case study</option>
+          <option value="Final round">Final round</option>
+          <option value="Reference check">Reference check</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Format</label>
+        <select class="form-select" id="i-format">
+          <option value="Video call">Video call</option>
+          <option value="Phone call">Phone call</option>
+          <option value="In-person">In-person</option>
+          <option value="Take-home">Take-home</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Interviewer(s)</label>
+      <input type="text" class="form-input" id="i-interviewer" placeholder="e.g. Rob (Head of Support Ops), Jackie (Recruiter)"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Notes / prep / what happened</label>
+      <textarea class="form-textarea" id="i-notes" rows="4" placeholder="Questions asked, your answers, how it felt, follow-up actions..."></textarea>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Outcome</label>
+        <select class="form-select" id="i-outcome">
+          <option value="pending">Pending / upcoming</option>
+          <option value="advanced">Advanced to next round</option>
+          <option value="offer">Received offer</option>
+          <option value="rejected">Rejected</option>
+          <option value="withdrew">I withdrew</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Feeling (1-5)</label>
+        <select class="form-select" id="i-feeling">
+          <option value="">—</option>
+          <option value="5">5 — Really well</option>
+          <option value="4">4 — Good</option>
+          <option value="3">3 — Okay</option>
+          <option value="2">2 — Rough</option>
+          <option value="1">1 — Tough one</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeIntModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveInterview()">Save interview</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let apps = JSON.parse(localStorage.getItem('jt_apps') || '[]');
+let interviews = JSON.parse(localStorage.getItem('jt_interviews') || '[]');
+let activity = JSON.parse(localStorage.getItem('jt_activity') || '[]');
+let editId = null;
+let filterStatus = 'all';
+
+function persist() {
+  localStorage.setItem('jt_apps', JSON.stringify(apps));
+  localStorage.setItem('jt_interviews', JSON.stringify(interviews));
+  localStorage.setItem('jt_activity', JSON.stringify(activity));
+}
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+function logActivity(event, company, note) {
+  activity.unshift({ id: Date.now(), date: new Date().toISOString(), event, company, note });
+  if (activity.length > 200) activity = activity.slice(0, 200);
+}
+
+function nav(page, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  btn.classList.add('active');
+  if (page === 'pipeline') renderPipeline();
+  if (page === 'interviews') renderInterviews();
+  if (page === 'timeline') renderTimeline();
+}
+
+function setFilter(el) {
+  document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  filterStatus = el.dataset.filter;
+  renderPipeline();
+}
+
+// STATS
+function renderStats() {
+  const counts = { wishlist:0, applied:0, screening:0, interview:0, offer:0, declined:0, ghosted:0 };
+  apps.forEach(a => { if (counts[a.status] !== undefined) counts[a.status]++; });
+  const active = apps.filter(a => ['applied','screening','interview'].includes(a.status)).length;
+  document.getElementById('stats-row').innerHTML = `
+    <div class="stat accent"><div class="stat-label">Total</div><div class="stat-val">${apps.length}</div><div class="stat-sub">applications</div></div>
+    <div class="stat"><div class="stat-label">Active</div><div class="stat-val">${active}</div><div class="stat-sub">in progress</div></div>
+    <div class="stat purple"><div class="stat-label">Interviews</div><div class="stat-val">${interviews.length}</div><div class="stat-sub">logged</div></div>
+    <div class="stat green"><div class="stat-label">Offers</div><div class="stat-val">${counts.offer}</div><div class="stat-sub">received</div></div>
+    <div class="stat amber"><div class="stat-label">Response rate</div><div class="stat-val">${apps.length ? Math.round(((apps.length - counts.wishlist - counts.ghosted) / Math.max(apps.filter(a=>a.status!=='wishlist').length,1)) * 100) : 0}%</div><div class="stat-sub">of sent apps</div></div>`;
+  document.getElementById('nc-pipeline').textContent = apps.length;
+  document.getElementById('nc-interviews').textContent = interviews.length;
+}
+
+// PIPELINE
+function renderPipeline() {
+  renderStats();
+  const q = (document.getElementById('search-input')?.value || '').toLowerCase();
+  let filtered = apps.filter(a => {
+    const matchStatus = filterStatus === 'all' || a.status === filterStatus;
+    const matchQ = !q || [a.company, a.role, a.contact, a.notes, a.referral].some(f => (f||'').toLowerCase().includes(q));
+    return matchStatus && matchQ;
+  });
+
+  filtered.sort((a,b) => {
+    const po = {high:0,med:1,low:2};
+    const so = {interview:0,screening:1,applied:2,offer:3,wishlist:4,declined:5,ghosted:6};
+    if ((so[a.status]??4) !== (so[b.status]??4)) return (so[a.status]??4) - (so[b.status]??4);
+    return (po[a.priority]??1) - (po[b.priority]??1);
+  });
+
+  const body = document.getElementById('pipeline-body');
+  if (!filtered.length) {
+    body.innerHTML = `<tr><td colspan="9"><div class="empty"><div class="empty-icon">📋</div><div class="empty-title">${apps.length ? 'No results' : 'No applications yet'}</div><div class="empty-sub">${apps.length ? 'Try a different filter or search.' : 'Click "Add application" to log your first one.'}</div></div></td></tr>`;
+    return;
+  }
+
+  body.innerHTML = filtered.map(a => {
+    const appInterviews = interviews.filter(i => i.company.toLowerCase() === a.company.toLowerCase());
+    return `<tr>
+      <td><span class="priority ${a.priority||'med'}" title="Priority: ${a.priority||'med'}"></span></td>
+      <td class="td-company">
+        ${a.url ? `<a href="${a.url}" target="_blank" style="color:inherit;text-decoration:none;border-bottom:1px dashed var(--border-md)">${a.company}</a>` : a.company}
+        ${a.referral ? `<div style="font-size:11px;color:var(--accent-dark);margin-top:1px">via ${a.referral}</div>` : ''}
+      </td>
+      <td class="td-role">${a.role}</td>
+      <td class="td-contact">
+        ${a.contact || '—'}
+        ${a.contactInfo ? `<div style="font-size:11px;color:var(--text3)">${a.contactInfo}</div>` : ''}
+      </td>
+      <td class="td-date">${a.date ? fmtDate(a.date) : '—'}</td>
+      <td>
+        <select class="status-sel ${a.status}" onchange="updateStatus('${a.id}',this.value,this)">
+          <option value="wishlist" ${a.status==='wishlist'?'selected':''}>Wishlist</option>
+          <option value="applied" ${a.status==='applied'?'selected':''}>Applied</option>
+          <option value="screening" ${a.status==='screening'?'selected':''}>Screening</option>
+          <option value="interview" ${a.status==='interview'?'selected':''}>Interview</option>
+          <option value="offer" ${a.status==='offer'?'selected':''}>Offer</option>
+          <option value="declined" ${a.status==='declined'?'selected':''}>Declined</option>
+          <option value="ghosted" ${a.status==='ghosted'?'selected':''}>Ghosted</option>
+        </select>
+      </td>
+      <td style="font-size:12px;color:var(--text2);max-width:150px">${a.next || (appInterviews.length ? `${appInterviews.length} interview${appInterviews.length>1?'s':''} logged` : '—')}</td>
+      <td class="td-notes" title="${(a.notes||'').replace(/"/g,'&quot;')}">${a.notes || '—'}</td>
+      <td>
+        <div class="td-actions">
+          <button class="btn-icon" onclick="editApp('${a.id}')" title="Edit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+          <button class="btn-icon" onclick="deleteApp('${a.id}')" title="Delete" style="color:var(--red)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6M10 11v6M14 11v6M9 6V4h6v2"/></svg></button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function fmtDate(d) {
+  if (!d) return '—';
+  const dt = new Date(d + 'T12:00:00');
+  return dt.toLocaleDateString('en-CA', { month: 'short', day: 'numeric' });
+}
+
+function fmtDateTime(iso) {
+  const dt = new Date(iso);
+  return dt.toLocaleDateString('en-CA', { month: 'short', day: 'numeric', year: 'numeric' }) + ' · ' + dt.toLocaleTimeString('en-CA', { hour: '2-digit', minute: '2-digit' });
+}
+
+function updateStatus(id, status, sel) {
+  const a = apps.find(x => x.id === id);
+  if (!a) return;
+  const old = a.status;
+  a.status = status;
+  sel.className = 'status-sel ' + status;
+  logActivity(`Status changed: ${old} → ${status}`, a.company, a.role);
+  persist();
+  renderStats();
+  toast('Status updated');
+}
+
+function deleteApp(id) {
+  const a = apps.find(x => x.id === id);
+  if (!confirm(`Remove ${a?.company || 'this application'}?`)) return;
+  logActivity('Application removed', a?.company || '', a?.role || '');
+  apps = apps.filter(x => x.id !== id);
+  persist();
+  renderPipeline();
+  toast('Removed');
+}
+
+// APP MODAL
+function openAppModal() {
+  editId = null;
+  document.getElementById('app-modal-title').textContent = 'Add application';
+  document.getElementById('f-date').value = new Date().toISOString().split('T')[0];
+  ['f-company','f-role','f-contact','f-contact-info','f-referral','f-url','f-next','f-notes','f-salary'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('f-status').value = 'applied';
+  document.getElementById('f-priority').value = 'med';
+  document.getElementById('app-modal').classList.add('open');
+  setTimeout(() => document.getElementById('f-company').focus(), 100);
+}
+
+function editApp(id) {
+  const a = apps.find(x => x.id === id);
+  if (!a) return;
+  editId = id;
+  document.getElementById('app-modal-title').textContent = 'Edit application';
+  document.getElementById('f-company').value = a.company || '';
+  document.getElementById('f-role').value = a.role || '';
+  document.getElementById('f-contact').value = a.contact || '';
+  document.getElementById('f-contact-info').value = a.contactInfo || '';
+  document.getElementById('f-referral').value = a.referral || '';
+  document.getElementById('f-date').value = a.date || '';
+  document.getElementById('f-status').value = a.status || 'applied';
+  document.getElementById('f-priority').value = a.priority || 'med';
+  document.getElementById('f-url').value = a.url || '';
+  document.getElementById('f-next').value = a.next || '';
+  document.getElementById('f-notes').value = a.notes || '';
+  document.getElementById('f-salary').value = a.salary || '';
+  document.getElementById('app-modal').classList.add('open');
+}
+
+function closeAppModal() { document.getElementById('app-modal').classList.remove('open'); }
+
+function saveApp() {
+  const company = document.getElementById('f-company').value.trim();
+  const role = document.getElementById('f-role').value.trim();
+  if (!company || !role) { toast('Company and role are required'); return; }
+  const data = {
+    company, role,
+    contact: document.getElementById('f-contact').value.trim(),
+    contactInfo: document.getElementById('f-contact-info').value.trim(),
+    referral: document.getElementById('f-referral').value.trim(),
+    date: document.getElementById('f-date').value,
+    status: document.getElementById('f-status').value,
+    priority: document.getElementById('f-priority').value,
+    url: document.getElementById('f-url').value.trim(),
+    next: document.getElementById('f-next').value.trim(),
+    notes: document.getElementById('f-notes').value.trim(),
+    salary: document.getElementById('f-salary').value.trim()
+  };
+  if (editId) {
+    const idx = apps.findIndex(x => x.id === editId);
+    apps[idx] = { ...apps[idx], ...data };
+    logActivity('Application updated', company, role);
+    toast('Updated');
+  } else {
+    apps.unshift({ id: String(Date.now()), ...data });
+    logActivity('Application added', company, role);
+    toast('Application saved');
+  }
+  persist();
+  closeAppModal();
+  renderPipeline();
+}
+
+// INTERVIEWS
+function openInterviewModal() {
+  const coSel = document.getElementById('i-company');
+  coSel.innerHTML = '<option value="">Select a company...</option>' +
+    apps.map(a => `<option value="${a.id}">${a.company}</option>`).join('');
+  document.getElementById('i-role').innerHTML = '<option value="">Select company first...</option>';
+  document.getElementById('i-date').value = new Date().toISOString().split('T')[0];
+  ['i-interviewer','i-notes','i-time'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('i-round').value = 'Recruiter screen';
+  document.getElementById('i-format').value = 'Video call';
+  document.getElementById('i-outcome').value = 'pending';
+  document.getElementById('i-feeling').value = '';
+  document.getElementById('int-modal').classList.add('open');
+  setTimeout(() => coSel.focus(), 100);
+}
+
+function populateInterviewRole() {
+  const appId = document.getElementById('i-company').value;
+  const roleSel = document.getElementById('i-role');
+  if (!appId) {
+    roleSel.innerHTML = '<option value="">Select company first...</option>';
+    return;
+  }
+  const matched = apps.filter(a => a.id === appId);
+  roleSel.innerHTML = matched.map(a => `<option value="${a.role}">${a.role}</option>`).join('');
+}
+
+function closeIntModal() { document.getElementById('int-modal').classList.remove('open'); }
+
+function saveInterview() {
+  const appId = document.getElementById('i-company').value;
+  const date = document.getElementById('i-date').value;
+  if (!appId || !date) { toast('Company and date are required'); return; }
+  const selectedApp = apps.find(a => a.id === appId);
+  const company = selectedApp ? selectedApp.company : '';
+  const role = document.getElementById('i-role').value;
+  const entry = {
+    id: String(Date.now()),
+    company,
+    role,
+    date,
+    time: document.getElementById('i-time').value,
+    round: document.getElementById('i-round').value,
+    format: document.getElementById('i-format').value,
+    interviewer: document.getElementById('i-interviewer').value.trim(),
+    notes: document.getElementById('i-notes').value.trim(),
+    outcome: document.getElementById('i-outcome').value,
+    feeling: document.getElementById('i-feeling').value
+  };
+  interviews.unshift(entry);
+  logActivity(`Interview logged: ${entry.round}`, company, role);
+
+  if (selectedApp && !['interview','offer','declined','ghosted'].includes(selectedApp.status)) {
+    selectedApp.status = 'interview';
+  }
+
+  persist();
+  closeIntModal();
+  renderInterviews();
+  renderStats();
+  toast('Interview logged');
+}
+
+function renderInterviews() {
+  const list = document.getElementById('interview-list');
+  if (!interviews.length) {
+    list.innerHTML = `<div class="empty"><div class="empty-icon">📅</div><div class="empty-title">No interviews logged yet</div><div class="empty-sub">Log recruiter calls, screening rounds, and panel interviews to track your progress.</div></div>`;
+    return;
+  }
+
+  const today = new Date(); today.setHours(0,0,0,0);
+  const upcoming = interviews.filter(i => new Date(i.date + 'T12:00:00') >= today);
+  const past = interviews.filter(i => new Date(i.date + 'T12:00:00') < today);
+
+  const feelingEmoji = { '5':'🟢', '4':'🔵', '3':'🟡', '2':'🟠', '1':'🔴' };
+  const outcomeLabel = { pending:'Upcoming', advanced:'Advanced', offer:'Offer received', rejected:'Rejected', withdrew:'Withdrew' };
+  const outcomeColor = { pending:'var(--accent)', advanced:'var(--green)', offer:'var(--green)', rejected:'var(--red)', withdrew:'var(--text3)' };
+
+  function cardHtml(i) {
+    const isPast = new Date(i.date + 'T12:00:00') < today;
+    return `<div class="interview-card ${isPast ? 'passed' : 'upcoming'}">
+      <div class="ic-top">
+        <div>
+          <div class="ic-company">${i.company}</div>
+          <div class="ic-role">${i.role || ''}</div>
+        </div>
+        <div class="ic-date-badge ${isPast ? 'past' : ''}">${fmtDate(i.date)}${i.time ? ' · ' + i.time : ''}</div>
+      </div>
+      <div class="ic-meta">
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>${i.round}</span>
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>${i.format}</span>
+        ${i.interviewer ? `<span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 11a4 4 0 100-8 4 4 0 000 8z"/></svg>${i.interviewer}</span>` : ''}
+        ${i.feeling ? `<span>${feelingEmoji[i.feeling]} Felt ${['','very hard','hard','okay','well','really well'][i.feeling]}</span>` : ''}
+        <span style="color:${outcomeColor[i.outcome]};font-weight:500">${outcomeLabel[i.outcome]||''}</span>
+      </div>
+      ${i.notes ? `<div class="ic-notes">${i.notes}</div>` : ''}
+      <div style="display:flex;gap:6px;margin-top:10px">
+        <button class="btn btn-ghost btn-sm" onclick="deleteInterview('${i.id}')">Remove</button>
+      </div>
+    </div>`;
+  }
+
+  let html = '';
+  if (upcoming.length) {
+    html += `<div class="section-divider">Upcoming (${upcoming.length})</div>`;
+    html += upcoming.sort((a,b) => a.date.localeCompare(b.date)).map(cardHtml).join('');
+  }
+  if (past.length) {
+    html += `<div class="section-divider">Past (${past.length})</div>`;
+    html += past.sort((a,b) => b.date.localeCompare(a.date)).map(cardHtml).join('');
+  }
+  list.innerHTML = html;
+}
+
+function deleteInterview(id) {
+  interviews = interviews.filter(i => i.id !== id);
+  persist();
+  renderInterviews();
+  renderStats();
+  toast('Removed');
+}
+
+// TIMELINE
+function renderTimeline() {
+  const list = document.getElementById('timeline-list');
+  if (!activity.length) {
+    list.innerHTML = `<div class="empty"><div class="empty-icon">⏱</div><div class="empty-title">No activity yet</div><div class="empty-sub">Everything you log will appear here in order.</div></div>`;
+    return;
+  }
+
+  const dotColor = (e) => {
+    if (e.includes('added')) return 'accent';
+    if (e.includes('Interview')) return '';
+    if (e.includes('offer') || e.includes('Offer')) return 'green';
+    if (e.includes('declined') || e.includes('removed')) return 'red';
+    if (e.includes('updated')) return 'amber';
+    return 'gray';
+  };
+
+  list.innerHTML = activity.map(a => `
+    <div class="tl-item">
+      <div class="tl-left">
+        <div class="tl-dot ${dotColor(a.event)}"></div>
+        <div class="tl-line"></div>
+      </div>
+      <div class="tl-content">
+        <div class="tl-event">${a.company} — ${a.event}</div>
+        ${a.note ? `<div class="tl-note">${a.note}</div>` : ''}
+        <div class="tl-meta">${fmtDateTime(a.date)}</div>
+      </div>
+    </div>`).join('');
+}
+
+// EXPORT
+function exportCSV() {
+  if (!apps.length) { toast('Nothing to export yet'); return; }
+  const headers = ['Company','Role','Status','Priority','Contact','Referral','Date Applied','Salary','Next Step','URL','Notes'];
+  const rows = apps.map(a => [a.company,a.role,a.status,a.priority||'',a.contact||'',a.referral||'',a.date||'',a.salary||'',a.next||'',a.url||'',(a.notes||'').replace(/,/g,';')].map(v => `"${v}"`).join(','));
+  const csv = [headers.join(','), ...rows].join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'job-applications.csv';
+  a.click(); URL.revokeObjectURL(url);
+  toast('CSV downloaded');
+}
+
+// INIT
+renderPipeline();
+</script>
+</body>
+</html>
