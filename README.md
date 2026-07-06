@@ -13,6 +13,7 @@ Export your entire pipeline to CSV anytime
 Works offline
 
 **How to use**
+
 Download the file and open it in any browser. Or visit the hosted version at minhbuilds.github.io/mynextrole.
 Built with
 HTML, CSS, and vanilla JavaScript. No frameworks, no dependencies, no tracking.
