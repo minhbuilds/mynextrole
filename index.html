@@ -103,6 +103,10 @@
   .table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; }
   table { width: 100%; border-collapse: collapse; }
   thead th { text-align: left; font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.07em; padding: 10px 14px; background: var(--surface2); border-bottom: 1px solid var(--border); white-space: nowrap; }
+  thead th.sortable { cursor: pointer; user-select: none; }
+  thead th.sortable:hover { color: var(--text); background: var(--border); }
+  thead th.sort-asc .sort-icon::after { content: ' ↑'; color: var(--accent); }
+  thead th.sort-desc .sort-icon::after { content: ' ↓'; color: var(--accent); }
   tbody td { padding: 12px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; font-size: 13px; }
   tbody tr:last-child td { border-bottom: none; }
   tbody tr:hover td { background: #FAFAF8; }
@@ -268,11 +272,11 @@
           <thead>
             <tr>
               <th style="width:20px"></th>
-              <th>Company</th>
-              <th>Role</th>
-              <th>Contact</th>
-              <th>Applied</th>
-              <th>Status</th>
+              <th class="sortable" data-col="company" onclick="sortBy('company')">Company <span class="sort-icon"></span></th>
+              <th class="sortable" data-col="role" onclick="sortBy('role')">Role <span class="sort-icon"></span></th>
+              <th class="sortable" data-col="contact" onclick="sortBy('contact')">Contact <span class="sort-icon"></span></th>
+              <th class="sortable" data-col="date" onclick="sortBy('date')">Applied <span class="sort-icon"></span></th>
+              <th class="sortable" data-col="status" onclick="sortBy('status')">Status <span class="sort-icon"></span></th>
               <th>Next step</th>
               <th>Notes</th>
               <th></th>
@@ -542,6 +546,19 @@ function renderStats() {
 }
 
 // PIPELINE
+let sortCol = null;
+let sortDir = 1;
+
+function sortBy(col) {
+  if (sortCol === col) sortDir *= -1;
+  else { sortCol = col; sortDir = 1; }
+  document.querySelectorAll('th.sortable').forEach(th => {
+    th.classList.remove('sort-asc','sort-desc');
+    if (th.dataset.col === col) th.classList.add(sortDir === 1 ? 'sort-asc' : 'sort-desc');
+  });
+  renderPipeline();
+}
+
 function renderPipeline() {
   renderStats();
   const q = (document.getElementById('search-input')?.value || '').toLowerCase();
@@ -551,12 +568,24 @@ function renderPipeline() {
     return matchStatus && matchQ;
   });
 
-  filtered.sort((a,b) => {
-    const po = {high:0,med:1,low:2};
-    const so = {interview:0,screening:1,applied:2,offer:3,wishlist:4,declined:5,rejected:5,ghosted:6};
-    if ((so[a.status]??4) !== (so[b.status]??4)) return (so[a.status]??4) - (so[b.status]??4);
-    return (po[a.priority]??1) - (po[b.priority]??1);
-  });
+  if (sortCol) {
+    filtered.sort((a,b) => {
+      let av = '', bv = '';
+      if (sortCol === 'company')  { av = a.company||''; bv = b.company||''; }
+      if (sortCol === 'role')     { av = a.role||''; bv = b.role||''; }
+      if (sortCol === 'contact')  { av = a.contact||''; bv = b.contact||''; }
+      if (sortCol === 'date')     { av = a.date||''; bv = b.date||''; }
+      if (sortCol === 'status')   { av = a.status||''; bv = b.status||''; }
+      return av.localeCompare(bv) * sortDir;
+    });
+  } else {
+    filtered.sort((a,b) => {
+      const po = {high:0,med:1,low:2};
+      const so = {interview:0,screening:1,applied:2,offer:3,wishlist:4,declined:5,rejected:5,ghosted:6};
+      if ((so[a.status]??4) !== (so[b.status]??4)) return (so[a.status]??4) - (so[b.status]??4);
+      return (po[a.priority]??1) - (po[b.priority]??1);
+    });
+  }
 
   const body = document.getElementById('pipeline-body');
   if (!filtered.length) {
@@ -724,8 +753,12 @@ function populateInterviewRole() {
     roleSel.innerHTML = '<option value="">Select company first...</option>';
     return;
   }
-  const matched = apps.filter(a => a.id === appId);
-  roleSel.innerHTML = matched.map(a => `<option value="${a.role}">${a.role}</option>`).join('');
+  const selectedApp = apps.find(a => a.id === appId);
+  if (!selectedApp) { roleSel.innerHTML = '<option value="">No roles found</option>'; return; }
+  // find all applications for the same company name to show all roles
+  const sameCompany = apps.filter(a => a.company.toLowerCase() === selectedApp.company.toLowerCase());
+  const uniqueRoles = [...new Map(sameCompany.map(a => [a.role, a])).values()];
+  roleSel.innerHTML = uniqueRoles.map(a => `<option value="${a.role}">${a.role}</option>`).join('');
 }
 
 function closeIntModal() { document.getElementById('int-modal').classList.remove('open'); }
